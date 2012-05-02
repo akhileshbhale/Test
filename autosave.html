@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head> <title>Web Storage</title>
+ <meta charset="UTF-8"/> 
+    <meta http-equiv="X-UA-Compatible" content="chrome=1"/> 
+
+    <link rel="stylesheet" href="slide-content.css"/> 
+    <link rel="stylesheet" href="slide-presentation.css"/> 
+    <link rel="stylesheet" href="prettify.css"/> 
+
+
+</head>
+
+<body>
+<!--
+ *
+ * LOCALSTORAGE EXAMPLE
+ *
+--> 
+<div class="slide" id="localstorage-example"> 
+  <header>Example: Auto-save Text</header> 
+  <section> 
+    <pre> 
+&lt;textarea id="ta" placeholder="Start typing..."&gt;&lt;/textarea&gt;
+</pre> 
+<pre style="margin-top:10px;font-size: 22px"> 
+document.querySelector('#ta').addEventListener('keyup', function(e) {
+  <b>localStorage.setItem('value', this.value);</b> 
+  <b>localStorage.setItem('timestamp', (new Date()).getTime());</b> 
+}, false);
+</pre> 
+  </section> 
+  <section> 
+    <textarea id="localstorage-ta" placeholder="Start typing..."></textarea> 
+    <br> 
+    <button id="localstorage-save">Save</button><button id="localstorage-clear">Clear</button> 
+    <p id="localstorage-log"></p> 
+  </section> 
+  <script> 
+    (function() {
+      var area = document.querySelector('#localstorage-ta');
+      var log = document.querySelector("#localstorage-log");
+      var timeoutId = null;
+      if (!area.value) {
+        area.value = window.localStorage.getItem('value');
+      }
+      updateLog(false);
+ 
+      // your content will be saved locally
+      document.querySelector('#localstorage-save').addEventListener('click', function (e) {
+        window.localStorage.setItem('value', area.value);
+        window.localStorage.setItem('timestamp', (new Date()).getTime());
+        updateLog(true);
+      }, false);
+ 
+      document.querySelector('#localstorage-clear').addEventListener('click', function () {
+        localStorage.removeItem('value');
+        localStorage.removeItem('timestamp');
+        log.style.opacity = 1;
+        log.textContent = 'Cleared';
+        area.value = '';
+        hideLog();
+      }, false);
+ 
+      area.addEventListener('keyup', function(e) {
+        window.localStorage.setItem('value', this.value);
+        updateLog(false);
+      }, false);
+ 
+      function hideLog() {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(function() {
+          log.style.opacity = 0;
+        }, 3000);
+      }
+ 
+      function updateLog(newSave) {
+        var delta = 0;
+        if (window.localStorage.getItem('value')) {
+          log.style.opacity = 1;
+          delta = ((new Date()).getTime() - (new Date()).setTime(window.localStorage.getItem('timestamp'))) / 1000;
+ 
+          if (newSave) {
+            log.style.opacity = 1;
+            log.textContent = 'Saved';
+            hideLog();
+          } else {
+            log.textContent = 'Last saved: ' + delta + 's ago';
+            hideLog();
+          }
+        }
+      }
+    })();
+  </script> 
+  </section> 
+</div> 
+</body>
+</html>
